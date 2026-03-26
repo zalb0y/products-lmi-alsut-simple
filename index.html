@@ -465,8 +465,41 @@
             return;
         }
         
-        // Buat worksheet
-        const ws = XLSX.utils.json_to_sheet(filteredData);
+        // Definisikan urutan kolom yang benar (sesuai tampilan website)
+        const columnOrder = [
+            "No", "Str", "Update", "Code", "Name", "Barcode", 
+            "Status", "WEIGHT", "Stk_Qty", "Price", "Price_Date",
+            "1", "2", "3", "4", "Bblm_Fg",
+            "Min_Qty_1", "Max_Qty_1", "Price_1",
+            "Min_Qty_2", "Max_Qty_2", "Price_2",
+            "Min_Qty_3", "Max_Qty_3", "Price_3",
+            "Min_Qty_4", "Max_Qty_4", "Price_4",
+            "Min_Qty_5", "Max_Qty_5", "Price_5"
+        ];
+        
+        // Header yang lebih readable untuk Excel
+        const headerNames = [
+            "No", "Store", "Update", "Code", "Name", "Barcode", 
+            "Status", "Weight", "Stk Qty", "Price", "Price Date",
+            "Cat1", "Cat2", "Cat3", "Cat4", "BBLM",
+            "Min Qty 1", "Max Qty 1", "Price 1",
+            "Min Qty 2", "Max Qty 2", "Price 2",
+            "Min Qty 3", "Max Qty 3", "Price 3",
+            "Min Qty 4", "Max Qty 4", "Price 4",
+            "Min Qty 5", "Max Qty 5", "Price 5"
+        ];
+        
+        // Reorder data sesuai urutan kolom
+        const orderedData = filteredData.map(row => {
+            const newRow = {};
+            columnOrder.forEach((key, index) => {
+                newRow[headerNames[index]] = row[key] !== undefined ? row[key] : "-";
+            });
+            return newRow;
+        });
+        
+        // Buat worksheet dengan urutan kolom yang benar
+        const ws = XLSX.utils.json_to_sheet(orderedData, { header: headerNames });
         
         // Buat workbook
         const wb = XLSX.utils.book_new();
