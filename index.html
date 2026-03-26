@@ -93,20 +93,31 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
-            overflow-x: auto;
         }
         
-        /* Pastikan tabel bisa scroll horizontal */
-        .dataTables_wrapper {
+        /* Fix untuk DataTables scrollX - header dan body sejajar */
+        .dataTables_scrollHead,
+        .dataTables_scrollBody {
+            overflow: visible !important;
+        }
+        
+        .dataTables_scroll {
             overflow-x: auto;
+            overflow-y: visible;
         }
         
         #example {
             font-size: 12px;
+            width: 100% !important;
+        }
+        
+        #example th,
+        #example td {
+            white-space: nowrap;
+            box-sizing: border-box;
         }
         
         #example th {
-            white-space: nowrap;
             font-size: 11px;
         }
         
