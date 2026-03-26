@@ -1,0 +1,654 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    
+    <!-- Bootstrap 3 CSS -->
+    <link rel="stylesheet" type="text/css" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/css/bootstrap.min.css" />
+    
+    <!-- DataTables CSS -->
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.13.6/css/dataTables.bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/fixedheader/3.4.0/css/fixedHeader.bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap.min.css" />
+    <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap.min.css" />
+    
+    <title>Lotte Grosir Alam Sutra</title>
+    
+    <style>
+        body {
+            padding-top: 20px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+        
+        .header-section {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        
+        .header-section h2 {
+            color: #d9534f;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .header-section .last-updated {
+            color: #777;
+            font-size: 14px;
+        }
+        
+        .filter-section {
+            margin-bottom: 15px;
+        }
+        
+        .filter-btn {
+            margin-right: 5px;
+            margin-bottom: 5px;
+        }
+        
+        .filter-btn.active {
+            background-color: #d9534f;
+            border-color: #d43f3a;
+            color: white;
+        }
+        
+        .action-section {
+            margin-bottom: 15px;
+        }
+        
+        .admin-section {
+            display: none;
+            margin-bottom: 15px;
+            padding: 10px;
+            background-color: #fcf8e3;
+            border: 1px solid #faebcc;
+            border-radius: 4px;
+        }
+        
+        .admin-section.visible {
+            display: block;
+        }
+        
+        .admin-trigger {
+            position: fixed;
+            bottom: 10px;
+            right: 10px;
+            font-size: 12px;
+            color: #ccc;
+            cursor: pointer;
+            z-index: 1000;
+            opacity: 0.5;
+            transition: opacity 0.3s;
+        }
+        
+        .admin-trigger:hover {
+            opacity: 1;
+            color: #999;
+        }
+        
+        .table-container {
+            background: white;
+            padding: 20px;
+            border-radius: 5px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+        
+        #example {
+            font-size: 12px;
+        }
+        
+        #example th {
+            white-space: nowrap;
+            font-size: 11px;
+        }
+        
+        .loading-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.8);
+            z-index: 9999;
+            justify-content: center;
+            align-items: center;
+        }
+        
+        .loading-overlay.visible {
+            display: flex;
+        }
+        
+        .loading-spinner {
+            text-align: center;
+        }
+        
+        .loading-spinner i {
+            font-size: 48px;
+            color: #d9534f;
+            animation: spin 1s linear infinite;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .container {
+                padding: 10px;
+            }
+            
+            #example {
+                font-size: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Loading Overlay -->
+    <div class="loading-overlay" id="loadingOverlay">
+        <div class="loading-spinner">
+            <i class="glyphicon glyphicon-refresh"></i>
+            <p>Memuat data...</p>
+        </div>
+    </div>
+    
+    <!-- Admin Trigger (hidden icon) -->
+    <div class="admin-trigger" id="adminTrigger" title="Admin">🔒</div>
+    
+    <div class="container-fluid">
+        <!-- Header -->
+        <div class="header-section">
+            <h2>Lotte Grosir Alam Sutra</h2>
+            <p class="last-updated" id="lastUpdated">Memuat data...</p>
+        </div>
+        
+        <!-- Admin Section (hidden by default) -->
+        <div class="admin-section" id="adminSection">
+            <div class="row">
+                <div class="col-md-12">
+                    <strong>🔐 Mode Admin</strong>
+                    <button type="button" class="btn btn-warning btn-sm" id="btnRefresh" style="margin-left: 15px;">
+                        <span class="glyphicon glyphicon-refresh"></span> Refresh Data
+                    </button>
+                    <span id="adminLastUpdated" style="margin-left: 15px; color: #666;"></span>
+                    <button type="button" class="btn btn-default btn-sm pull-right" id="btnLogout">
+                        Logout
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Filter & Action Section -->
+        <div class="row">
+            <div class="col-md-8">
+                <div class="filter-section">
+                    <strong>Filter BBLM:</strong>
+                    <button type="button" class="btn btn-default btn-sm filter-btn active" data-filter="all">All</button>
+                    <button type="button" class="btn btn-default btn-sm filter-btn" data-filter="yes">BBLM Only</button>
+                    <button type="button" class="btn btn-default btn-sm filter-btn" data-filter="no">Non BBLM</button>
+                </div>
+            </div>
+            <div class="col-md-4 text-right">
+                <div class="action-section">
+                    <button type="button" class="btn btn-success btn-sm" id="btnDownload">
+                        <span class="glyphicon glyphicon-download-alt"></span> Download Excel
+                    </button>
+                </div>
+            </div>
+        </div>
+        
+        <!-- Table Container -->
+        <div class="table-container">
+            <table id="example" class="table table-striped table-bordered table-condensed" style="width:100%">
+            </table>
+        </div>
+    </div>
+    
+    <!-- Scripts -->
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"></script>
+    <script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.7/js/bootstrap.min.js"></script>
+    
+    <!-- DataTables -->
+    <script src="https://cdn.datatables.net/1.13.6/js/jquery.dataTables.min.js"></script>
+    <script src="https://cdn.datatables.net/1.13.6/js/dataTables.bootstrap.min.js"></script>
+    <script src="https://cdn.datatables.net/fixedheader/3.4.0/js/dataTables.fixedHeader.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/dataTables.responsive.min.js"></script>
+    <script src="https://cdn.datatables.net/responsive/2.5.0/js/responsive.bootstrap.min.js"></script>
+    
+    <!-- SheetJS for Excel Export -->
+    <script src="https://cdn.sheetjs.com/xlsx-0.20.0/package/dist/xlsx.full.min.js"></script>
+    
+    <!-- SweetAlert -->
+    <script src="https://unpkg.com/sweetalert/dist/sweetalert.min.js"></script>
+    
+    <script type="text/javascript">
+    // =====================================================================
+    // KONFIGURASI - ISI BAGIAN INI SECARA MANUAL
+    // =====================================================================
+    
+    // TODO: Ganti dengan URL Google Apps Script Web App Anda
+    // Cara mendapatkan: Deploy GAS > Copy Web App URL
+    // Format: https://script.google.com/macros/s/XXXXX/exec
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbweVGdv4CIPQ3IR7eU0HAgTc1Hn0sRYwkpE2JuFqG5J7kIi9bX6nRmapoHpTNjMnO468A/exec";
+    
+    // TODO: Ganti dengan password admin (harus sama dengan password di GAS)
+    const ADMIN_PASSWORD = "linbad";
+    
+    // =====================================================================
+    // VARIABEL GLOBAL
+    // =====================================================================
+    
+    let dataTable = null;
+    let allData = [];
+    let currentFilter = 'all';
+    let isAdminMode = false;
+    
+    // =====================================================================
+    // INISIALISASI
+    // =====================================================================
+    
+    $(document).ready(function() {
+        // Load data saat halaman dibuka
+        loadData();
+        
+        // Event handlers
+        setupEventHandlers();
+    });
+    
+    // =====================================================================
+    // FUNGSI UTAMA
+    // =====================================================================
+    
+    /**
+     * loadData() - Mengambil data dari GAS endpoint
+     */
+    function loadData() {
+        showLoading(true);
+        
+        $.ajax({
+            url: GAS_URL,
+            method: 'GET',
+            dataType: 'json',
+            success: function(response) {
+                if (response.error) {
+                    showError('Error: ' + response.message);
+                    return;
+                }
+                
+                allData = response.data || [];
+                
+                // Update last updated info
+                updateLastUpdated(response.last_updated);
+                
+                // Initialize atau reload DataTable
+                initDataTable(allData);
+                
+                showLoading(false);
+            },
+            error: function(xhr, status, error) {
+                showLoading(false);
+                showError('Gagal memuat data: ' + error);
+            }
+        });
+    }
+    
+    /**
+     * initDataTable() - Inisialisasi DataTables
+     */
+    function initDataTable(data) {
+        // Destroy existing table jika ada
+        if (dataTable) {
+            dataTable.destroy();
+            $('#example').empty();
+        }
+        
+        // Definisi kolom
+        const columns = [
+            { title: "No", data: "No" },
+            { title: "Store", data: "Str" },
+            { title: "Update", data: "Update" },
+            { title: "Code", data: "Code" },
+            { title: "Name", data: "Name" },
+            { title: "Barcode", data: "Barcode" },
+            { title: "Status", data: "Status" },
+            { title: "Weight", data: "WEIGHT" },
+            { title: "Stk Qty", data: "Stk_Qty" },
+            { title: "Price", data: "Price" },
+            { title: "Price Date", data: "Price_Date" },
+            { title: "Cat1", data: "1" },
+            { title: "Cat2", data: "2" },
+            { title: "Cat3", data: "3" },
+            { title: "Cat4", data: "4" },
+            { title: "BBLM", data: "Bblm_Fg" },
+            { title: "Min1", data: "Min_Qty_1" },
+            { title: "Max1", data: "Max_Qty_1" },
+            { title: "Price1", data: "Price_1" },
+            { title: "Min2", data: "Min_Qty_2" },
+            { title: "Max2", data: "Max_Qty_2" },
+            { title: "Price2", data: "Price_2" },
+            { title: "Min3", data: "Min_Qty_3" },
+            { title: "Max3", data: "Max_Qty_3" },
+            { title: "Price3", data: "Price_3" },
+            { title: "Min4", data: "Min_Qty_4" },
+            { title: "Max4", data: "Max_Qty_4" },
+            { title: "Price4", data: "Price_4" },
+            { title: "Min5", data: "Min_Qty_5" },
+            { title: "Max5", data: "Max_Qty_5" },
+            { title: "Price5", data: "Price_5" }
+        ];
+        
+        // Inisialisasi DataTable
+        dataTable = $('#example').DataTable({
+            data: data,
+            columns: columns,
+            pageLength: 25,
+            lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
+            order: [[0, 'asc']],
+            fixedHeader: true,
+            responsive: true,
+            deferRender: true,
+            processing: true,
+            language: {
+                processing: "Memproses...",
+                search: "Cari:",
+                lengthMenu: "Tampilkan _MENU_ data",
+                info: "Menampilkan _START_ - _END_ dari _TOTAL_ data",
+                infoEmpty: "Tidak ada data",
+                infoFiltered: "(difilter dari _MAX_ total data)",
+                paginate: {
+                    first: "Pertama",
+                    previous: "Sebelumnya",
+                    next: "Berikutnya",
+                    last: "Terakhir"
+                },
+                zeroRecords: "Tidak ada data yang cocok"
+            },
+            columnDefs: [
+                { targets: [0], width: "40px" },
+                { targets: [3, 5], className: "text-nowrap" },
+                { targets: [8, 9], className: "text-right" }
+            ]
+        });
+    }
+    
+    /**
+     * setupEventHandlers() - Setup semua event handlers
+     */
+    function setupEventHandlers() {
+        // Filter BBLM
+        $('.filter-btn').on('click', function() {
+            const filter = $(this).data('filter');
+            applyBBLMFilter(filter);
+            
+            // Update button states
+            $('.filter-btn').removeClass('active');
+            $(this).addClass('active');
+        });
+        
+        // Download Excel
+        $('#btnDownload').on('click', function() {
+            downloadExcel();
+        });
+        
+        // Admin trigger (hidden lock icon)
+        $('#adminTrigger').on('click', function() {
+            if (!isAdminMode) {
+                showAdminLogin();
+            }
+        });
+        
+        // Refresh button
+        $('#btnRefresh').on('click', function() {
+            refreshData();
+        });
+        
+        // Logout button
+        $('#btnLogout').on('click', function() {
+            logoutAdmin();
+        });
+    }
+    
+    // =====================================================================
+    // FUNGSI FILTER
+    // =====================================================================
+    
+    /**
+     * applyBBLMFilter() - Filter data berdasarkan BBLM Flag
+     */
+    function applyBBLMFilter(filter) {
+        currentFilter = filter;
+        
+        if (!dataTable) return;
+        
+        // Clear existing search pada kolom BBLM (index 15)
+        dataTable.column(15).search('');
+        
+        if (filter === 'yes') {
+            dataTable.column(15).search('^Yes$', true, false).draw();
+        } else if (filter === 'no') {
+            dataTable.column(15).search('^No$', true, false).draw();
+        } else {
+            dataTable.draw();
+        }
+    }
+    
+    // =====================================================================
+    // FUNGSI DOWNLOAD
+    // =====================================================================
+    
+    /**
+     * downloadExcel() - Download data yang ditampilkan sebagai Excel
+     */
+    function downloadExcel() {
+        if (!dataTable) {
+            showError('Data belum dimuat');
+            return;
+        }
+        
+        // Ambil data yang sedang ditampilkan (hasil filter)
+        const filteredData = dataTable.rows({ search: 'applied' }).data().toArray();
+        
+        if (filteredData.length === 0) {
+            showError('Tidak ada data untuk didownload');
+            return;
+        }
+        
+        // Buat worksheet
+        const ws = XLSX.utils.json_to_sheet(filteredData);
+        
+        // Buat workbook
+        const wb = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(wb, ws, "Data");
+        
+        // Generate filename dengan tanggal
+        const today = new Date();
+        const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
+        const filename = `LotteGrosir_${dateStr}.xlsx`;
+        
+        // Download
+        XLSX.writeFile(wb, filename);
+        
+        swal({
+            title: "Berhasil!",
+            text: `File ${filename} telah didownload`,
+            icon: "success",
+            timer: 2000
+        });
+    }
+    
+    // =====================================================================
+    // FUNGSI ADMIN
+    // =====================================================================
+    
+    /**
+     * showAdminLogin() - Tampilkan popup login admin
+     */
+    function showAdminLogin() {
+        swal({
+            title: "Login Admin",
+            text: "Masukkan password admin:",
+            content: {
+                element: "input",
+                attributes: {
+                    type: "password",
+                    placeholder: "Password"
+                }
+            },
+            buttons: {
+                cancel: "Batal",
+                confirm: {
+                    text: "Login",
+                    closeModal: false
+                }
+            }
+        }).then(function(password) {
+            if (!password) {
+                swal.close();
+                return;
+            }
+            
+            // Validasi password di frontend
+            if (password === ADMIN_PASSWORD) {
+                isAdminMode = true;
+                $('#adminSection').addClass('visible');
+                $('#adminTrigger').hide();
+                
+                swal({
+                    title: "Berhasil!",
+                    text: "Anda telah login sebagai admin",
+                    icon: "success",
+                    timer: 1500
+                });
+            } else {
+                swal({
+                    title: "Gagal!",
+                    text: "Password salah",
+                    icon: "error"
+                });
+            }
+        });
+    }
+    
+    /**
+     * refreshData() - Manual refresh data dari Excel
+     */
+    function refreshData() {
+        swal({
+            title: "Refresh Data?",
+            text: "Ini akan memproses ulang file Excel terbaru di Google Drive",
+            icon: "warning",
+            buttons: {
+                cancel: "Batal",
+                confirm: {
+                    text: "Ya, Refresh!",
+                    closeModal: false
+                }
+            }
+        }).then(function(confirm) {
+            if (!confirm) {
+                swal.close();
+                return;
+            }
+            
+            showLoading(true);
+            
+            // Panggil GAS dengan parameter refresh
+            $.ajax({
+                url: GAS_URL + '?action=refresh&pwd=' + encodeURIComponent(ADMIN_PASSWORD),
+                method: 'GET',
+                dataType: 'json',
+                success: function(response) {
+                    showLoading(false);
+                    
+                    if (response.success) {
+                        swal({
+                            title: "Berhasil!",
+                            text: "Data berhasil diperbarui.\n" + 
+                                  "File: " + response.source_file + "\n" +
+                                  "Total: " + response.total_rows + " baris",
+                            icon: "success"
+                        }).then(function() {
+                            // Reload data
+                            loadData();
+                        });
+                    } else {
+                        swal({
+                            title: "Gagal!",
+                            text: response.message || "Terjadi kesalahan",
+                            icon: "error"
+                        });
+                    }
+                },
+                error: function(xhr, status, error) {
+                    showLoading(false);
+                    swal({
+                        title: "Error!",
+                        text: "Gagal refresh: " + error,
+                        icon: "error"
+                    });
+                }
+            });
+        });
+    }
+    
+    /**
+     * logoutAdmin() - Logout dari mode admin
+     */
+    function logoutAdmin() {
+        isAdminMode = false;
+        $('#adminSection').removeClass('visible');
+        $('#adminTrigger').show();
+        
+        swal({
+            title: "Logout",
+            text: "Anda telah logout dari mode admin",
+            icon: "info",
+            timer: 1500
+        });
+    }
+    
+    // =====================================================================
+    // FUNGSI HELPER
+    // =====================================================================
+    
+    /**
+     * updateLastUpdated() - Update info waktu terakhir update
+     */
+    function updateLastUpdated(timestamp) {
+        if (timestamp) {
+            $('#lastUpdated').text('As Of: ' + timestamp);
+            $('#adminLastUpdated').text('Last Updated: ' + timestamp);
+        } else {
+            $('#lastUpdated').text('');
+        }
+    }
+    
+    /**
+     * showLoading() - Tampilkan/sembunyikan loading overlay
+     */
+    function showLoading(show) {
+        if (show) {
+            $('#loadingOverlay').addClass('visible');
+        } else {
+            $('#loadingOverlay').removeClass('visible');
+        }
+    }
+    
+    /**
+     * showError() - Tampilkan pesan error
+     */
+    function showError(message) {
+        swal({
+            title: "Error",
+            text: message,
+            icon: "error"
+        });
+    }
+    </script>
+</body>
+</html>
