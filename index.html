@@ -93,6 +93,12 @@
             padding: 20px;
             border-radius: 5px;
             box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+            overflow-x: auto;
+        }
+        
+        /* Pastikan tabel bisa scroll horizontal */
+        .dataTables_wrapper {
+            overflow-x: auto;
         }
         
         #example {
@@ -350,7 +356,8 @@
             lengthMenu: [[10, 25, 50, 100, -1], [10, 25, 50, 100, "All"]],
             order: [[0, 'asc']],
             fixedHeader: true,
-            responsive: true,
+            scrollX: true,
+            autoWidth: false,
             deferRender: true,
             processing: true,
             language: {
