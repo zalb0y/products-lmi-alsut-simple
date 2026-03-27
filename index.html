@@ -659,7 +659,7 @@
             // Untuk customer: hanya tampilkan tanggal (ambil bagian sebelum jam)
             // Format timestamp: "27 Mar 2026 09:00:00 WIB"
             var dateOnly = timestamp.split(' ').slice(0, 3).join(' ');
-            $('#lastUpdated').text('As Of: ' + dateOnly);
+            $('#lastUpdated').text(dateOnly);
             
             // Untuk admin: tampilkan lengkap dengan jam
             $('#adminLastUpdated').text('Last Updated: ' + timestamp);
