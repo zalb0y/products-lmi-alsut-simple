@@ -503,7 +503,7 @@
         // Generate filename dengan tanggal
         const today = new Date();
         const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
-        const filename = `LotteMart_${dateStr}.xlsx`;
+        const filename = `LotteAlamSutera_${dateStr}.xlsx`;
         
         // Download
         XLSX.writeFile(wb, filename);
