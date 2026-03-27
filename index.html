@@ -241,7 +241,7 @@
     // TODO: Ganti dengan URL Google Apps Script Web App Anda
     // Cara mendapatkan: Deploy GAS > Copy Web App URL
     // Format: https://script.google.com/macros/s/XXXXX/exec
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbwQnIhGwdmAOi7aVuwxtkitl19xP8ZKGqzTh-25hT9t7fwVdmEndloM_bFmg4Urg8e_OA/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbyokbMezepJcjgtbxQMq0zjPTaDVWu9Q68cx6hBC-IsoyNtLSiZ3GMUv-VvxijImu9DbA/exec";
     
     // TODO: Ganti dengan password admin (harus sama dengan password di GAS)
     const ADMIN_PASSWORD = "linbad";
@@ -324,7 +324,6 @@
             { title: "Weight", data: "WEIGHT" },
             { title: "Stk Qty", data: "Stk_Qty" },
             { title: "Price", data: "Price" },
-            { title: "Price Date", data: "Price_Date" },
             { title: "Cat1", data: "1" },
             { title: "Cat2", data: "2" },
             { title: "Cat3", data: "3" },
@@ -657,7 +656,12 @@
      */
     function updateLastUpdated(timestamp) {
         if (timestamp) {
-            $('#lastUpdated').text('As Of: ' + timestamp);
+            // Untuk customer: hanya tampilkan tanggal (ambil bagian sebelum jam)
+            // Format timestamp: "27 Mar 2026 09:00:00 WIB"
+            var dateOnly = timestamp.split(' ').slice(0, 3).join(' ');
+            $('#lastUpdated').text('As Of: ' + dateOnly);
+            
+            // Untuk admin: tampilkan lengkap dengan jam
             $('#adminLastUpdated').text('Last Updated: ' + timestamp);
         } else {
             $('#lastUpdated').text('');
