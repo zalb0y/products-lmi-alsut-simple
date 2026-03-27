@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap.min.css" />
     
-    <title>Lotte Mart Alam Sutera</title>
+    <title>Lotte Grosir Alam Sutra</title>
     
     <style>
         body {
@@ -170,7 +170,7 @@
     <div class="container-fluid">
         <!-- Header -->
         <div class="header-section">
-            <h2>Lotte Mart Alam Sutera</h2>
+            <h2>Lotte Grosir Alam Sutra</h2>
             <p class="last-updated" id="lastUpdated">Memuat data...</p>
         </div>
         
@@ -241,7 +241,7 @@
     // TODO: Ganti dengan URL Google Apps Script Web App Anda
     // Cara mendapatkan: Deploy GAS > Copy Web App URL
     // Format: https://script.google.com/macros/s/XXXXX/exec
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbyokbMezepJcjgtbxQMq0zjPTaDVWu9Q68cx6hBC-IsoyNtLSiZ3GMUv-VvxijImu9DbA/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbx-W145QCYDsMiTDdD8bQSaw9kC_OQ4aSkSOoY8lwXLv0DJb5HRyebJ8Yk4FsujBOlsfQ/exec";
     
     // TODO: Ganti dengan password admin (harus sama dengan password di GAS)
     const ADMIN_PASSWORD = "linbad";
@@ -318,12 +318,15 @@
         const columns = [
             { title: "No", data: "No" },
             { title: "Store", data: "Str" },
+            { title: "Update", data: "Update" },
             { title: "Code", data: "Code" },
             { title: "Name", data: "Name" },
             { title: "Barcode", data: "Barcode" },
+            { title: "Status", data: "Status" },
             { title: "Weight", data: "WEIGHT" },
             { title: "Stk Qty", data: "Stk_Qty" },
             { title: "Price", data: "Price" },
+            { title: "Price Date", data: "Price_Date" },
             { title: "Cat1", data: "1" },
             { title: "Cat2", data: "2" },
             { title: "Cat3", data: "3" },
@@ -431,8 +434,10 @@
         dataTable.column(15).search('');
         
         if (filter === 'yes') {
-            dataTable.column(15).search('^Yes$', true, false).draw();
+            // Case-insensitive search untuk "Yes"
+            dataTable.column(15).search('Yes').draw();
         } else if (filter === 'no') {
+            // Case-insensitive search untuk "No"
             dataTable.column(15).search('^No$', true, false).draw();
         } else {
             dataTable.draw();
@@ -659,7 +664,7 @@
             // Untuk customer: hanya tampilkan tanggal (ambil bagian sebelum jam)
             // Format timestamp: "27 Mar 2026 09:00:00 WIB"
             var dateOnly = timestamp.split(' ').slice(0, 3).join(' ');
-            $('#lastUpdated').text(dateOnly);
+            $('#lastUpdated').text('As Of: ' + dateOnly);
             
             // Untuk admin: tampilkan lengkap dengan jam
             $('#adminLastUpdated').text('Last Updated: ' + timestamp);
