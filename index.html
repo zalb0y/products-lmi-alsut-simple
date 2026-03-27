@@ -241,7 +241,7 @@
     // TODO: Ganti dengan URL Google Apps Script Web App Anda
     // Cara mendapatkan: Deploy GAS > Copy Web App URL
     // Format: https://script.google.com/macros/s/XXXXX/exec
-    const GAS_URL = "https://script.google.com/macros/s/AKfycbx-W145QCYDsMiTDdD8bQSaw9kC_OQ4aSkSOoY8lwXLv0DJb5HRyebJ8Yk4FsujBOlsfQ/exec";
+    const GAS_URL = "https://script.google.com/macros/s/AKfycbw6DcQlB9VM3Af6pnpDwW67T5hsHyx2ECMbt_CHbZGX_1Wts-m5fH0MP2toS7VfGtCAbQ/exec";
     
     // TODO: Ganti dengan password admin (harus sama dengan password di GAS)
     const ADMIN_PASSWORD = "linbad";
@@ -314,19 +314,16 @@
             $('#example').empty();
         }
         
-        // Definisi kolom
+        // Definisi kolom (tanpa Update, Status, Price Date)
         const columns = [
             { title: "No", data: "No" },
             { title: "Store", data: "Str" },
-            { title: "Update", data: "Update" },
             { title: "Code", data: "Code" },
             { title: "Name", data: "Name" },
             { title: "Barcode", data: "Barcode" },
-            { title: "Status", data: "Status" },
             { title: "Weight", data: "WEIGHT" },
             { title: "Stk Qty", data: "Stk_Qty" },
             { title: "Price", data: "Price" },
-            { title: "Price Date", data: "Price_Date" },
             { title: "Cat1", data: "1" },
             { title: "Cat2", data: "2" },
             { title: "Cat3", data: "3" },
@@ -375,8 +372,8 @@
             },
             columnDefs: [
                 { targets: [0], width: "40px" },
-                { targets: [3, 5], className: "text-nowrap" },
-                { targets: [8, 9], className: "text-right" }
+                { targets: [2, 4], className: "text-nowrap" },
+                { targets: [6, 7], className: "text-right" }
             ]
         });
     }
@@ -430,15 +427,13 @@
         
         if (!dataTable) return;
         
-        // Clear existing search pada kolom BBLM (index 15)
-        dataTable.column(15).search('');
+        // Clear existing search pada kolom BBLM (index 12 setelah hapus 3 kolom)
+        dataTable.column(12).search('');
         
         if (filter === 'yes') {
-            // Case-insensitive search untuk "Yes"
-            dataTable.column(15).search('Yes').draw();
+            dataTable.column(12).search('Yes').draw();
         } else if (filter === 'no') {
-            // Case-insensitive search untuk "No"
-            dataTable.column(15).search('^No$', true, false).draw();
+            dataTable.column(12).search('^No$', true, false).draw();
         } else {
             dataTable.draw();
         }
@@ -465,10 +460,10 @@
             return;
         }
         
-        // Definisikan urutan kolom yang benar (sesuai tampilan website)
+        // Definisikan urutan kolom yang benar (tanpa Update, Status, Price Date)
         const columnOrder = [
-            "No", "Str", "Update", "Code", "Name", "Barcode", 
-            "Status", "WEIGHT", "Stk_Qty", "Price", "Price_Date",
+            "No", "Str", "Code", "Name", "Barcode", 
+            "WEIGHT", "Stk_Qty", "Price",
             "1", "2", "3", "4", "Bblm_Fg",
             "Min_Qty_1", "Max_Qty_1", "Price_1",
             "Min_Qty_2", "Max_Qty_2", "Price_2",
@@ -479,8 +474,8 @@
         
         // Header yang lebih readable untuk Excel
         const headerNames = [
-            "No", "Store", "Update", "Code", "Name", "Barcode", 
-            "Status", "Weight", "Stk Qty", "Price", "Price Date",
+            "No", "Store", "Code", "Name", "Barcode", 
+            "Weight", "Stk Qty", "Price",
             "Cat1", "Cat2", "Cat3", "Cat4", "BBLM",
             "Min Qty 1", "Max Qty 1", "Price 1",
             "Min Qty 2", "Max Qty 2", "Price 2",
