@@ -14,7 +14,7 @@
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/responsive/2.5.0/css/responsive.bootstrap.min.css" />
     <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/buttons/2.4.1/css/buttons.bootstrap.min.css" />
     
-    <title>Lotte Grosir Alam Sutra</title>
+    <title>Lotte Mart Alam Sutera</title>
     
     <style>
         body {
@@ -170,7 +170,7 @@
     <div class="container-fluid">
         <!-- Header -->
         <div class="header-section">
-            <h2>Lotte Grosir Alam Sutra</h2>
+            <h2>Lotte Mart Alam Sutera</h2>
             <p class="last-updated" id="lastUpdated">Memuat data...</p>
         </div>
         
@@ -503,7 +503,7 @@
         // Generate filename dengan tanggal
         const today = new Date();
         const dateStr = today.toISOString().split('T')[0].replace(/-/g, '');
-        const filename = `LotteGrosir_${dateStr}.xlsx`;
+        const filename = `LotteMart_${dateStr}.xlsx`;
         
         // Download
         XLSX.writeFile(wb, filename);
